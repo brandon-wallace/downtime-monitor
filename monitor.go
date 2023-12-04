@@ -61,9 +61,11 @@ func OpenFile(f string, sites map[string]int) {
 
 // printTable displays a table of each website.
 func printTable(website chan Website) {
-	fmt.Println("-------------------------------------------------\n| Status | Interval | URL                       |")
+	fmt.Println("\n-------------------------------------------------" +
+		"\n| Status | Interval | URL                       |")
 	for w := range website {
-		fmt.Printf("-------------------------------------------------\n| %-6s | %-8d | %-25s |\n", fmt.Sprint(w.StatusCode), w.Interval, w.URL)
+		fmt.Printf("-------------------------------------------------\n"+
+			"| %-6s | %-8d | %-25s |\n", fmt.Sprint(w.StatusCode), w.Interval, w.URL)
 	}
 }
 
