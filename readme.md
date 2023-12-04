@@ -44,5 +44,3 @@ $ make build
 ```
 $ ./monitor
 ```
-
->>>>>>> 734be63 (Update project)
