@@ -18,7 +18,9 @@ const (
 
 // init function runs before main.
 func init() {
-	fmt.Println("Starting Downtime Monitor")
+	if os.Getenv("ENV") == "development" {
+		fmt.Println("Development environment enabled")
+	}
 }
 
 type Website struct {
@@ -129,6 +131,7 @@ func GetStatusCode(url string) (int, error) {
 }
 
 func main() {
+	fmt.Println("Starting Downtime Monitor")
 	websites := make(map[string]int)
 	OpenFile(filename, websites)
 
