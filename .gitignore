@@ -18,4 +18,6 @@
 go.work
 monitor
 
+*.db
+
 
