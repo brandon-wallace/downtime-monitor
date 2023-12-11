@@ -1,0 +1,37 @@
+{{define "layout"}}
+<!DOCTYPE html>
+<html lang='en'>
+
+  <head>
+    <meta charset='utf-8'>
+    <link rel='shortcut icon' href='/static/images/favicon.ico' type='image/x-icon'>
+    <link rel='shortcut icon' href='/static/images/favicon.png' type='image/x-icon'>
+    <link rel="stylesheet" type="text/css" href="/static/css/style.css">
+    <title>{{template "title" .}} downtime-monitor</title>
+  </head>
+
+  <body>
+
+    <noscript>
+      Please enable Javascript to view the page properly.
+    </noscript>
+
+    <header>
+      <h1 class="center"><small>downtime-monitor</small></h1>
+    </header>
+    
+    <main>
+      {{template "main" .}}
+    </main>
+
+    <footer>
+      <p class="center"><time><span>00:00:00</span></time></p>
+      <p class="center"><small>websocket: </small><span class="websocket-status">disconnected</span></p>
+      <p class="center"><a href="https://brandonwallace.cc" target="_blank" rel="nonreferrer">Brandon Wallace</a> &copy; <script>document.write(new Date().getFullYear());</script></p>
+    </footer>
+
+    <script src="/static/js/script.js" type="text/javascript"></script>
+  </body>
+  
+</html>
+{{end}}

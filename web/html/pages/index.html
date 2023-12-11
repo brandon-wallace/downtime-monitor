@@ -1,0 +1,64 @@
+{{define "title"}}{{end}}
+
+{{define "main"}}
+
+    <button id="openModal" type="button">Add Website</button>
+    <dialog id="dialogModal" class="modal">
+
+        <h3>Add Website</h3>
+
+        <form action="/" method="POST">
+            <label for="name">Name:</label>
+            <input type="text" name="name" id="name" placeholder="example.com">
+
+            <label for="url">URL:</label>
+            <input type="text" name="url" id="url" placeholder="https://example.com">
+
+            <label for="interval">Interval:</label>
+            <input type="number" name="interval" id="interval" min="30" max="60" placeholder="30 seconds">
+
+            <div class="modal-buttons">
+                <button type="submit" id="submit" class="primary">Submit</button>
+                <button type="reset" id="cancel">Cancel</button>
+            </div>
+        </form>
+
+    </dialog>
+
+    {{if .Websites}}
+
+      <table>
+
+          <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>URL</th>
+              <th>Status</th>
+              <th>Date Added</th>
+              <th>Uptime</th>
+              <th>Interval</th>
+              <th>Remove</th>
+          </tr>
+          
+          {{range .Websites}}
+          <tr class="row">
+              <td class="id">{{.ID}}</td>
+              <td class="align-left">{{.Name}}</td>
+              <td class="align-left">{{.URL}}</td>
+              <td class="status-code">{{.StatusCode}}</td>
+              <td>{{.DateAdded}}</td>
+              <td class="time">{{.Uptime}}</td>
+              <td>{{.Interval}}s</td>
+              <td class="remove"><a href="/site/?id={{.ID}}">&#x274c;</a></td>
+          </tr>
+          {{end}}
+
+      </table>
+
+    {{else}}
+        <p class="center">No servers being monitored!</p>
+    {{end}}
+
+   <!-- <img src="/static/images/arrow-down.png" alt="arrow image"> -->
+
+{{end}}
