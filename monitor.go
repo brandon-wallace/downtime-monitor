@@ -1,20 +1,23 @@
 package main
 
 import (
-	"encoding/csv"
+	"database/sql"
 	"fmt"
-	"io"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/brandon-wallace/downtime-monitor.git/internal/models"
+	_ "github.com/mattn/go-sqlite3"
 )
 
-const (
-	filename = "websites.csv"
-)
+const port = ":8000"
+
+var websiteIDSet = make(map[int]struct{})
 
 // init function runs before main.
 func init() {

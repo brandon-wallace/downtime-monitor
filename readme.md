@@ -10,13 +10,6 @@ $ git clone git@github.com:brandon-wallace/downtime-monitor.git
 $ cd downtime-monitor/
 ```
 
-### Add a website URL and interval in seconds delimited by a comma in the websites.csv file.
-```
-$ vim websites.csv
-
-https://new-example.com,60
-```
-
 ### Format code
 
 ```
@@ -43,4 +36,7 @@ $ make build
 
 ```
 $ ./monitor
+
 ```
+
+### Browse to http://127.0.0.1:8000
