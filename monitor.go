@@ -219,19 +219,11 @@ func Index(w http.ResponseWriter, r *http.Request) {
 				websiteIDSet[websites[i].ID] = struct{}{}
 				wg.Add(1)
 				go runTask(&wg, w.URL, siteCh, w.Interval)
-				fmt.Println(w.Name)
 			}
 		}
 		wg.Wait()
 
 	}()
-	for s := range siteCh {
-		fmt.Println(s)
-	}
-
-	for k, _ := range websiteIDSet {
-		fmt.Println("key ID:", k)
-	}
 
 	files := []string{
 		"./web/html/layout.html",
@@ -268,6 +260,7 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 	if err := models.Delete(db, id); err != nil {
 		fmt.Println("Delete error", err)
 	}
+	delete(websiteIDSet, id)
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
