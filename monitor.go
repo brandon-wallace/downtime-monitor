@@ -19,7 +19,7 @@ const port = ":8000"
 
 var websiteIDSet = make(map[int]struct{})
 
-// init function runs before main.
+// init function.
 func init() {
 	if os.Getenv("ENV") == "development" {
 		fmt.Println("Development environment enabled")
@@ -29,6 +29,7 @@ func init() {
 type Site interface {
 	AddSite(website *models.Website) (int, error)
 	GetAllSites() ([]*models.Website, error)
+	Delete(id int) error
 }
 
 type siteDB struct {
@@ -57,7 +58,6 @@ func (site *siteDB) AddSite(w *models.Website) (int, error) {
 func (site *siteDB) GetAllSites() ([]*models.Website, error) {
 	rows, err := site.db.Query("SELECT id, name, url, status_code, date_added, uptime, interval FROM websites ORDER BY id ASC")
 	if err != nil {
-		fmt.Println("1 ERROR ->", err)
 		return nil, err
 	}
 	defer rows.Close()
@@ -67,17 +67,37 @@ func (site *siteDB) GetAllSites() ([]*models.Website, error) {
 		w := &models.Website{}
 		rows.Scan()
 		if err := rows.Scan(&w.ID, &w.Name, &w.URL, &w.StatusCode, &w.DateAdded, &w.Uptime, &w.Interval); err != nil {
-			fmt.Println("2 ERROR ->", err)
 			return nil, err
 		}
 		websites = append(websites, w)
 	}
 	if err = rows.Err(); err != nil {
-		fmt.Println("3 ERROR ->", err)
 		return nil, err
 	}
 
 	return websites, nil
+}
+
+func (site *siteDB) Delete(id int) error {
+	statement, err := site.db.Prepare("DELETE FROM websites WHERE id = ?")
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+
+	result, err := statement.Exec(id)
+	if err != nil {
+		return fmt.Errorf("error executing statement %v", err)
+	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("error executing statement %v", err)
+	}
+	if rowsAffected == 0 {
+		return fmt.Errorf("error %d rows affected", rowsAffected)
+	}
+
+	return nil
 }
 
 var site Site
@@ -193,7 +213,6 @@ func Index(w http.ResponseWriter, r *http.Request) {
 			Interval:   int(i),
 		}
 
-		fmt.Println(r.PostFormValue("name"), r.PostFormValue("url"), status, now.Format("2006-01-02 15:03:04"), formatTimedelta(timedelta), int(i))
 		id, err := site.AddSite(&w)
 		if err != nil {
 			log.Printf("insert error: %v", err)
@@ -245,19 +264,12 @@ func Index(w http.ResponseWriter, r *http.Request) {
 }
 
 // Delete deletes one website from the database
-func Delete(w http.ResponseWriter, r *http.Request) {
+func DeleteWebsite(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.URL.Query().Get("id"))
 	if err != nil {
 		fmt.Println("Error converting to integer", err)
 	}
-
-	db, err := models.OpenDB()
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
-	if err := models.Delete(db, id); err != nil {
+	if err := site.Delete(id); err != nil {
 		fmt.Println("Delete error", err)
 	}
 	delete(websiteIDSet, id)
@@ -284,7 +296,7 @@ func main() {
 
 	// mux.HandleFunc("/echo", echo)
 	mux.HandleFunc("/", Index)
-	mux.HandleFunc("/site/", Delete)
+	mux.HandleFunc("/site/", DeleteWebsite)
 
 	logErr := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 
@@ -294,7 +306,7 @@ func main() {
 		Handler:  mux,
 	}
 
-	fmt.Printf("Starting server http://127.0.0.1 on %s\n", port)
+	fmt.Printf("Starting server http://127.0.0.1 on port %s\n", port)
 	if err := server.ListenAndServe(); err != nil {
 		log.Fatal(err)
 	}

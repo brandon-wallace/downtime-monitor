@@ -2,7 +2,6 @@ package models
 
 import (
 	"database/sql"
-	"fmt"
 	"time"
 )
 
@@ -53,27 +52,4 @@ func OpenDB() (*sql.DB, error) {
 	db.SetConnMaxLifetime(30 * time.Second)
 
 	return db, nil
-}
-
-// Delete
-func Delete(db *sql.DB, id int) error {
-	statement, err := db.Prepare("DELETE FROM websites WHERE id = ?")
-	if err != nil {
-		return err
-	}
-	defer statement.Close()
-
-	result, err := statement.Exec(id)
-	if err != nil {
-		return fmt.Errorf("error executing statement %v", err)
-	}
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		return fmt.Errorf("error executing statement %v", err)
-	}
-	if rowsAffected == 0 {
-		return fmt.Errorf("error %d rows affected", rowsAffected)
-	}
-
-	return nil
 }
